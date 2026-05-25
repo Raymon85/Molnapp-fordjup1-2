@@ -18,6 +18,8 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
+// Development = SQLite (inner loop, no Docker)
+// DockerCompose / Production = SQL Server
 if (builder.Environment.IsDevelopment())
 {
     builder.Services.AddDbContext<ApplicationDbContext>(o => o.UseSqlite(connectionString));
@@ -47,6 +49,31 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.SameSite = SameSiteMode.Strict;
     options.LoginPath = "/Identity/Account/Login";
     options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+
+    // Log auth events — never log passwords or tokens
+    options.Events.OnSignedIn = ctx =>
+    {
+        var logger = ctx.HttpContext.RequestServices
+            .GetRequiredService<ILogger<Program>>();
+        logger.LogInformation("User signed in: {User}", ctx.Principal?.Identity?.Name);
+        return Task.CompletedTask;
+    };
+    options.Events.OnSigningOut = ctx =>
+    {
+        var logger = ctx.HttpContext.RequestServices
+            .GetRequiredService<ILogger<Program>>();
+        logger.LogInformation("User signed out: {User}", ctx.HttpContext.User.Identity?.Name);
+        return Task.CompletedTask;
+    };
+    options.Events.OnRedirectToLogin = ctx =>
+    {
+        var logger = ctx.HttpContext.RequestServices
+            .GetRequiredService<ILogger<Program>>();
+        logger.LogWarning("Unauthenticated access to {Path}, redirecting to login",
+            ctx.Request.Path);
+        ctx.Response.Redirect(ctx.RedirectUri);
+        return Task.CompletedTask;
+    };
 });
 
 // ── Azure Blob Storage ────────────────────────────────────────────────────────
@@ -132,7 +159,6 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 app.MapRazorPages().WithStaticAssets();
-app.MapControllers();
-app.MapHealthChecks("/healthz");
+app.MapControllers(); // includes HealthController at /healthz with detailed JSON
 
 app.Run();

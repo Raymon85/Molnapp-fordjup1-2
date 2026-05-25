@@ -141,18 +141,26 @@ az containerapp create \
     "seed-admin-email=admin@cloudsoft.com" \
     "seed-admin-password=$(openssl rand -base64 16)@A1"
 
-# ── Configure readiness probe ─────────────────────────────────────────────────
-echo "==> Configuring readiness probe"
+# ── Configure readiness probe via YAML patch ─────────────────────────────────
+echo "==> Configuring readiness probe on container app"
 MSYS_NO_PATHCONV=1 az containerapp update \
   --resource-group "$RESOURCE_GROUP" \
   --name "$CONTAINER_APP_NAME" \
-  --set-env-vars "DUMMY=placeholder" \
-  2>/dev/null || true
-
-MSYS_NO_PATHCONV=1 az containerapp ingress update \
-  --resource-group "$RESOURCE_GROUP" \
-  --name "$CONTAINER_APP_NAME" \
-  --target-port 8080 2>/dev/null || true
+  --yaml - <<'YAML'
+properties:
+  template:
+    containers:
+      - name: recruitment-portal
+        probes:
+          - type: Readiness
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            failureThreshold: 3
+YAML
+echo "Readiness probe configured at /healthz"
 
 # ── Assign Managed Identity roles ────────────────────────────────────────────
 APP_PRINCIPAL_ID=$(az containerapp show \

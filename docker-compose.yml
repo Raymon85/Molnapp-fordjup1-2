@@ -6,7 +6,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=DockerCompose
       - ConnectionStrings__DefaultConnection=Server=db;Database=RecruitmentPortal;User Id=sa;Password=Dev@Pass123!;TrustServerCertificate=True
       - ConnectionStrings__BlobStorage=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OgyolXR/fBMpwG7JSmk6yTz1w8HrPHpRTGF4=;BlobEndpoint=http://azurite:10000/devstoreaccount1;
       - BlobStorage__ContainerName=cv-uploads
