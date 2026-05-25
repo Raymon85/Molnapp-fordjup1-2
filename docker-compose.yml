@@ -1,0 +1,50 @@
+services:
+  app:
+    build:
+      context: ./RecruitmentPortal
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=db;Database=RecruitmentPortal;User Id=sa;Password=Dev@Pass123!;TrustServerCertificate=True
+      - ConnectionStrings__BlobStorage=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OgyolXR/fBMpwG7JSmk6yTz1w8HrPHpRTGF4=;BlobEndpoint=http://azurite:10000/devstoreaccount1;
+      - BlobStorage__ContainerName=cv-uploads
+      - Seed__AdminEmail=admin@cloudsoft.local
+      - Seed__AdminPassword=Admin@12345!
+      - ApiKey=local-dev-api-key
+    depends_on:
+      db:
+        condition: service_healthy
+      azurite:
+        condition: service_started
+    restart: unless-stopped
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Dev@Pass123!
+      - MSSQL_PID=Developer
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqldata:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P Dev@Pass123! -Q 'SELECT 1' -No -C || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    ports:
+      - "10000:10000"
+    volumes:
+      - azuritedata:/data
+    command: "azurite-blob --blobHost 0.0.0.0 --loose"
+
+volumes:
+  sqldata:
+  azuritedata:

@@ -1,0 +1,49 @@
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<h1>Admin Dashboard</h1>
+<hr />
+
+<div class="row g-4 mb-4">
+    <div class="col-sm-6 col-lg-3">
+        <div class="card text-bg-primary shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Total Jobs</h5>
+                <p class="display-6">@ViewBag.TotalJobs</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="card text-bg-success shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Active Jobs</h5>
+                <p class="display-6">@ViewBag.ActiveJobs</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="card text-bg-info shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Total Applications</h5>
+                <p class="display-6">@ViewBag.TotalApplications</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="card text-bg-warning shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Pending Review</h5>
+                <p class="display-6">@ViewBag.PendingApplications</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex gap-2">
+    <a asp-action="Jobs" class="btn btn-primary">Manage Jobs</a>
+    <a asp-action="Applications" class="btn btn-outline-primary">Review Applications</a>
+    <a asp-action="CreateJob" class="btn btn-success">+ New Job</a>
+    <a href="/swagger" class="btn btn-outline-secondary">API Docs</a>
+    <a href="/healthz" class="btn btn-outline-info" target="_blank">Health Status</a>
+</div>

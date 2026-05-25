@@ -1,0 +1,55 @@
+@{
+    ViewData["Title"] = "Home";
+}
+
+<div class="p-5 mb-4 bg-dark text-white rounded-3">
+    <div class="container-fluid py-3">
+        <h1 class="display-5 fw-bold">CloudSoft Recruitment Portal</h1>
+        <p class="col-md-8 fs-4">Find your next opportunity at CloudSoft. Browse open positions and apply today.</p>
+        <a class="btn btn-primary btn-lg" asp-controller="Jobs" asp-action="Index">Browse Jobs</a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Find a Job</h5>
+                <p class="card-text">Browse our open positions across all departments and locations.</p>
+                <a asp-controller="Jobs" asp-action="Index" class="btn btn-outline-primary">View Openings</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Apply Easily</h5>
+                <p class="card-text">Submit your cover letter and CV directly through our portal.</p>
+                @if (!User.Identity!.IsAuthenticated)
+                {
+                    <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-outline-success">Register Now</a>
+                }
+                else
+                {
+                    <a asp-controller="Jobs" asp-action="Index" class="btn btn-outline-success">Browse Jobs</a>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Track Applications</h5>
+                <p class="card-text">Log in to track the status of your submitted applications.</p>
+                @if (User.IsInRole("Candidate"))
+                {
+                    <a asp-controller="Jobs" asp-action="MyApplications" class="btn btn-outline-secondary">My Applications</a>
+                }
+                else if (!User.Identity!.IsAuthenticated)
+                {
+                    <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-outline-secondary">Login</a>
+                }
+            </div>
+        </div>
+    </div>
+</div>

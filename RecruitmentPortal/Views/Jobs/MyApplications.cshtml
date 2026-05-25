@@ -1,0 +1,59 @@
+@model IEnumerable<RecruitmentPortal.Models.JobApplication>
+
+@{
+    ViewData["Title"] = "My Applications";
+}
+
+<h1>My Applications</h1>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info mt-3">
+        You haven't applied to any jobs yet.
+        <a asp-action="Index">Browse jobs</a> to get started.
+    </div>
+}
+else
+{
+    <table class="table table-striped mt-3">
+        <thead>
+            <tr>
+                <th>Job</th>
+                <th>Department</th>
+                <th>Location</th>
+                <th>Applied</th>
+                <th>Status</th>
+                <th>CV</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var app in Model)
+            {
+                <tr>
+                    <td><a asp-action="Details" asp-route-id="@app.JobPostingId">@app.JobPosting.Title</a></td>
+                    <td>@app.JobPosting.Department</td>
+                    <td>@app.JobPosting.Location</td>
+                    <td>@app.AppliedAt.ToString("MMM dd, yyyy")</td>
+                    <td>
+                        <span class="badge bg-@(app.Status switch {
+                            RecruitmentPortal.Models.ApplicationStatus.Accepted => "success",
+                            RecruitmentPortal.Models.ApplicationStatus.Rejected => "danger",
+                            RecruitmentPortal.Models.ApplicationStatus.Reviewed => "info",
+                            _ => "secondary"
+                        })">@app.Status</span>
+                    </td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(app.CvBlobUrl))
+                        {
+                            <a href="@app.CvBlobUrl" target="_blank">@app.CvFileName</a>
+                        }
+                        else
+                        {
+                            <span class="text-muted">—</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

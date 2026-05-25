@@ -1,0 +1,44 @@
+@model RecruitmentPortal.Models.JobPosting
+
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-action="Index">Jobs</a></li>
+        <li class="breadcrumb-item active">@Model.Title</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-lg-8">
+        <h1>@Model.Title</h1>
+        <p class="text-muted">@Model.Department &bull; @Model.Location &bull; Posted @Model.PostedAt.ToString("MMMM dd, yyyy")</p>
+        <hr />
+        <p style="white-space: pre-wrap">@Model.Description</p>
+    </div>
+    <div class="col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                @if (!User.Identity!.IsAuthenticated)
+                {
+                    <p>You must be logged in as a candidate to apply.</p>
+                    <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-primary w-100">Login to Apply</a>
+                }
+                else if (User.IsInRole("Admin"))
+                {
+                    <p class="text-muted">Admins cannot apply for jobs.</p>
+                }
+                else if ((bool?)ViewBag.HasApplied == true)
+                {
+                    <div class="alert alert-success mb-0">You have already applied for this position.</div>
+                }
+                else
+                {
+                    <a asp-action="Apply" asp-route-id="@Model.Id" class="btn btn-success w-100">Apply Now</a>
+                }
+            </div>
+        </div>
+    </div>
+</div>

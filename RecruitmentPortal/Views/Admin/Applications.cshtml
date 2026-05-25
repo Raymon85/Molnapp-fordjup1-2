@@ -1,0 +1,80 @@
+@model IEnumerable<RecruitmentPortal.Models.JobApplication>
+
+@{
+    ViewData["Title"] = "Applications";
+}
+
+<h1>Applications</h1>
+@if (ViewBag.FilterJobId != null)
+{
+    <p class="text-muted">Filtered by job. <a asp-action="Applications">Show all</a></p>
+}
+<hr />
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No applications found.</div>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Job</th>
+                <th>Applicant</th>
+                <th>Applied</th>
+                <th>CV</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var app in Model)
+            {
+                <tr>
+                    <td>@app.JobPosting.Title</td>
+                    <td>@(app.Applicant.FullName ?? app.Applicant.Email)</td>
+                    <td>@app.AppliedAt.ToString("MMM dd, yyyy")</td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(app.CvBlobUrl))
+                        {
+                            <a href="@app.CvBlobUrl" target="_blank" class="btn btn-sm btn-outline-secondary">Download</a>
+                        }
+                        else
+                        {
+                            <span class="text-muted">—</span>
+                        }
+                    </td>
+                    <td>
+                        <span class="badge bg-@(app.Status switch {
+                            RecruitmentPortal.Models.ApplicationStatus.Accepted => "success",
+                            RecruitmentPortal.Models.ApplicationStatus.Rejected => "danger",
+                            RecruitmentPortal.Models.ApplicationStatus.Reviewed => "info",
+                            _ => "secondary"
+                        })">@app.Status</span>
+                    </td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">
+                                Update
+                            </button>
+                            <ul class="dropdown-menu">
+                                @foreach (var status in Enum.GetValues<RecruitmentPortal.Models.ApplicationStatus>())
+                                {
+                                    <li>
+                                        <form asp-action="UpdateApplicationStatus" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@app.Id" />
+                                            <input type="hidden" name="status" value="@status" />
+                                            <button type="submit" class="dropdown-item">@status</button>
+                                        </form>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

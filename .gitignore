@@ -1,0 +1,28 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+*.swp
+*.sln.docstates
+
+## Secrets
+appsettings.Development.json
+appsettings.*.json
+!appsettings.json
+secrets.json
+.env
+*.env
+
+## SQLite local DB
+*.db
+*.db-shm
+*.db-wal
+
+## OS
+.DS_Store
+Thumbs.db
+
+## Docker
+docker-compose.override.yml

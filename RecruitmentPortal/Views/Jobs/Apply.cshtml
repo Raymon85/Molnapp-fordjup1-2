@@ -1,0 +1,46 @@
+@{
+    ViewData["Title"] = "Apply";
+    var job = (RecruitmentPortal.Models.JobPosting)ViewBag.Job!;
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-action="Index">Jobs</a></li>
+        <li class="breadcrumb-item"><a asp-action="Details" asp-route-id="@job!.Id">@job.Title</a></li>
+        <li class="breadcrumb-item active">Apply</li>
+    </ol>
+</nav>
+
+<h1>Apply for @job.Title</h1>
+<p class="text-muted">@job.Department &bull; @job.Location</p>
+<hr />
+
+<div class="row">
+    <div class="col-lg-7">
+        <form asp-action="Apply" asp-route-id="@job.Id" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Cover Letter <span class="text-danger">*</span></label>
+                <textarea name="coverLetter" class="form-control" rows="8"
+                          placeholder="Introduce yourself and explain why you're a great fit..."></textarea>
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <span class="text-danger">@ViewData.ModelState["coverLetter"]?.Errors.FirstOrDefault()?.ErrorMessage</span>
+                }
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Upload CV (optional, PDF/DOC, max 5MB)</label>
+                <input type="file" name="cvFile" class="form-control" accept=".pdf,.doc,.docx" />
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <span class="text-danger">@ViewData.ModelState["cvFile"]?.Errors.FirstOrDefault()?.ErrorMessage</span>
+                }
+            </div>
+
+            <button type="submit" class="btn btn-success">Submit Application</button>
+            <a asp-action="Details" asp-route-id="@job.Id" class="btn btn-outline-secondary ms-2">Cancel</a>
+        </form>
+    </div>
+</div>
