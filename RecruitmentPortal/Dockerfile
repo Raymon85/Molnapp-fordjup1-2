@@ -6,7 +6,7 @@ COPY RecruitmentPortal.csproj .
 RUN dotnet restore
 
 COPY . .
-RUN dotnet publish -c Release -o /app/publish --no-restore
+RUN dotnet publish -c Release -o /app/publish
 
 # Stage 2: Runtime
 # .NET 10 aspnet image already runs as non-root user 'app' (uid=1654)
