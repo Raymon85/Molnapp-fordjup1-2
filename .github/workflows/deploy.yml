@@ -88,7 +88,7 @@ jobs:
           az containerapp update \
             --name ${{ secrets.CONTAINER_APP }} \
             --resource-group ${{ secrets.RESOURCE_GROUP }} \
-            --image ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }} \
+            --image ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:latest \
             --set-env-vars "DEPLOY_SHA=${{ github.sha }}"
 
       - name: Verify deployment
