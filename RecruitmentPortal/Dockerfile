@@ -9,12 +9,9 @@ COPY . .
 RUN dotnet publish -c Release -o /app/publish --no-restore
 
 # Stage 2: Runtime
+# .NET 10 aspnet image already runs as non-root user 'app' (uid=1654)
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
-
-# Create non-root user for security
-RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
-USER appuser
 
 COPY --from=build /app/publish .
 
