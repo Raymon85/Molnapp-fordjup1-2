@@ -123,8 +123,8 @@ az containerapp create \
   --image "mcr.microsoft.com/dotnet/samples:aspnetapp" \
   --target-port 8080 \
   --ingress external \
-  --min-replicas 1 \
-  --max-replicas 3 \
+  --min-replicas 0 \
+  --max-replicas 1 \
   --system-assigned \
   --env-vars \
     "ASPNETCORE_ENVIRONMENT=Production" \
@@ -139,10 +139,20 @@ az containerapp create \
     "sql-connection-string=${SQL_CONN_STRING}" \
     "api-key=$(openssl rand -hex 32)" \
     "seed-admin-email=admin@cloudsoft.com" \
-    "seed-admin-password=$(openssl rand -base64 16)@A1" \
-  --readiness-probe-path "/healthz" \
-  --readiness-probe-period-seconds 15 \
-  --readiness-probe-failure-threshold 3
+    "seed-admin-password=$(openssl rand -base64 16)@A1"
+
+# ── Configure readiness probe ─────────────────────────────────────────────────
+echo "==> Configuring readiness probe"
+MSYS_NO_PATHCONV=1 az containerapp update \
+  --resource-group "$RESOURCE_GROUP" \
+  --name "$CONTAINER_APP_NAME" \
+  --set-env-vars "DUMMY=placeholder" \
+  2>/dev/null || true
+
+MSYS_NO_PATHCONV=1 az containerapp ingress update \
+  --resource-group "$RESOURCE_GROUP" \
+  --name "$CONTAINER_APP_NAME" \
+  --target-port 8080 2>/dev/null || true
 
 # ── Assign Managed Identity roles ────────────────────────────────────────────
 APP_PRINCIPAL_ID=$(az containerapp show \

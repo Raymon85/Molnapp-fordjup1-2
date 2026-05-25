@@ -2,9 +2,9 @@ name: Build and Deploy
 
 on:
   push:
-    branches: [main]
+    branches: [master]
   pull_request:
-    branches: [main]
+    branches: [master]
 
 env:
   IMAGE_NAME: recruitment-portal
@@ -62,7 +62,7 @@ jobs:
         with:
           context: ./RecruitmentPortal
           file: ./RecruitmentPortal/Dockerfile
-          push: ${{ github.ref == 'refs/heads/main' }}
+          push: ${{ github.ref == 'refs/heads/master' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
@@ -70,7 +70,7 @@ jobs:
     name: Deploy to Azure Container Apps
     runs-on: ubuntu-latest
     needs: build-and-push
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/master'
     permissions:
       id-token: write
       contents: read
